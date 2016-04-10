@@ -1,0 +1,1 @@
+#Please put in this folder the nvdcve-2.0-XXXX.xml files
