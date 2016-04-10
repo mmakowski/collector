@@ -77,7 +77,7 @@ class CVE_Parser(year: Int) {
             factory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false)
             var cve = ""
             var cw = ""
-            var linux = false
+            var softstudy = false
             while (eventReader.hasNext()) {
                 var xmlEvent = eventReader.nextEvent()
                 if (xmlEvent.isStartElement) {
@@ -86,7 +86,7 @@ class CVE_Parser(year: Int) {
                     when (startElement.name.localPart) {
 
                         "entry" -> {
-                            linux = false
+                            softstudy = false
                             val idAttr = startElement.getAttributeByName(QName("id"))
                             cw = ""
                             cve = idAttr?.value ?: cve
@@ -101,7 +101,7 @@ class CVE_Parser(year: Int) {
                                         val m = softwareMatch(ttt)
                                         if (m.find()) {
                                             val soft = m.group(1)
-                                            if (soft.compareTo(Constants.SOFTWARE) == 0) linux = true
+                                            if (soft.compareTo(Constants.SOFTWARE) == 0) softstudy = true
                                         }
                                     }
                                 }
@@ -115,7 +115,7 @@ class CVE_Parser(year: Int) {
                                     val m = softwareMatch(xmlEvent.asCharacters().data)
                                     if (m.find()) {
                                         val soft = m.group(1)
-                                        if (soft.compareTo(Constants.SOFTWARE) == 0) linux = true
+                                        if (soft.compareTo(Constants.SOFTWARE) == 0) softstudy = true
                                     }
                                 }
                                 xmlEvent = eventReader.nextEvent()
@@ -139,7 +139,7 @@ class CVE_Parser(year: Int) {
                                 var lin = idAttr.value
                                 val m = urlMatch(lin)
                                 val cvecwe: String
-                                if (m.find() && linux) {
+                                if (m.find() && softstudy) {
                                     if (cw != "") {
                                         cvecwe = cw + "_" + cve
                                     } else

@@ -40,4 +40,7 @@ object Constants {
     //Software to look for
     var SOFTWARE_GIT = "*"
 
+    var JYTHON= "*"
+    var FILE_EXTENSION = "*"
+
 }

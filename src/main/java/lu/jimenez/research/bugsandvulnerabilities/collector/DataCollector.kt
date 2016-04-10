@@ -31,7 +31,9 @@ import java.util.*
 
 class DataCollector(repositoryPath: String, savingFolder: String) {
 
-    companion object Main {
+
+
+    companion object run {
 
         @JvmStatic
         fun main(args: Array<String>) {
@@ -65,6 +67,8 @@ class DataCollector(repositoryPath: String, savingFolder: String) {
             Constants.YEAR_BEGINNING= properties.getProperty("yearBeginning").toInt()
             Constants.YEAR_END=properties.getProperty("yearEnd").toInt()
             Constants.SOFTWARE_GIT=properties.getProperty("softwareGit")
+            Constants.JYTHON = properties.getProperty("jython")
+            Constants.FILE_EXTENSION = properties.getProperty("extension")
 
         }
     }
