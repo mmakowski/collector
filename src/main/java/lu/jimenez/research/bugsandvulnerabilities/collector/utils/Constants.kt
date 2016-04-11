@@ -1,12 +1,9 @@
-package lu.jimenez.research.bugsandvulnerabilities.collector.constants
-
-
 /////////////////////////////////////////////////////////////////////////////////////////
-//                 University of Luxembourg  - 
+//                 University of Luxembourg  -
 //                 Interdisciplinary center for Security and Trust (SnT)
 //                 Copyright © 2016 University of Luxembourg, SnT
-// 
-//  
+//
+//
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
 //  License as published by the Free Software Foundation; either
@@ -23,9 +20,12 @@ package lu.jimenez.research.bugsandvulnerabilities.collector.constants
 //
 //
 //
-//    Author: Matthieu Jimenez – SnT – matthieu.jimenez@uni.lu 
+//    Author: Matthieu Jimenez – SnT – matthieu.jimenez@uni.lu
 //
 //////////////////////////////////////////////////////////////////////////////////////////
+package lu.jimenez.research.bugsandvulnerabilities.collector.utils
+
+
 
 object Constants {
     //general spec
@@ -44,5 +44,18 @@ object Constants {
     var JYTHON= "*"
     var FILE_EXTENSION = "*"
 
+    val DEFAULT_BUG_INDICATORS = listOf(
+            "error",
+            "bug",
+            "fix",
+            "issue",
+            "mistake",
+            "incorrect",
+            "fault",
+            "defect",
+            "flaw"
+    )
+    var BUG_SHARE = 1
+    var CLEAR_SHARE: Int = 1
 
 }

@@ -25,7 +25,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 package lu.jimenez.research.bugsandvulnerabilities.collector
 
-import lu.jimenez.research.bugsandvulnerabilities.collector.constants.Constants
+import lu.jimenez.research.bugsandvulnerabilities.collector.utils.Constants
 import java.util.*
 
 
@@ -70,7 +70,8 @@ class DataCollector(repositoryPath: String, savingFolder: String) {
             Constants.JYTHON = properties.getProperty("jython")
             Constants.FILE_EXTENSION = properties.getProperty("extension")
             Constants.BUG_TRACKER = properties.getProperty("bugTracker")
-
+            Constants.BUG_SHARE = properties.getProperty("bugShare").toInt()
+            Constants.CLEAR_SHARE = properties.getProperty("clearShare").toInt()
         }
     }
 }

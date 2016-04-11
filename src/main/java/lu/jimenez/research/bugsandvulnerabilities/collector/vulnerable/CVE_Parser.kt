@@ -25,7 +25,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 package lu.jimenez.research.bugsandvulnerabilities.collector.vulnerable
 
-import lu.jimenez.research.bugsandvulnerabilities.collector.constants.Constants
+import lu.jimenez.research.bugsandvulnerabilities.collector.utils.Constants
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.net.URL

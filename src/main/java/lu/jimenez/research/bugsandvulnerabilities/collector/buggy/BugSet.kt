@@ -25,7 +25,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 package lu.jimenez.research.bugsandvulnerabilities.collector.buggy
 
-import lu.jimenez.research.bugsandvulnerabilities.collector.constants.Constants
+import lu.jimenez.research.bugsandvulnerabilities.collector.utils.Constants
+import lu.jimenez.research.bugsandvulnerabilities.collector.utils.Utils
 import lu.jimenez.research.bugsandvulnerabilities.model.BuggyFile
 import lu.jimenez.research.bugsandvulnerabilities.model.internal.Document
 import lu.jimenez.research.bugsandvulnerabilities.utils.MultiThreading
@@ -35,32 +36,34 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.revwalk.RevCommit
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.*
 
-/**
- * Class allowing the creation of set gathering all the commit mentionning a bug report
- * (likely to be patches)
- *
- * @param path to the git repository
- * @property pathToRepo path to the .git folder
- */
-class BugReportSet(path: String) {
+
+class BugSet(path:String){
     val pathToRepo = "$path.git"
 
     /**
-     * Method to create a list of all commit containing at least one link toward a bug report page
+     * Method to create a list of all commit containing one of the keyword
      *
-     * @param listOfAlreadyUsedCommit list of commit implicated in a vulnerability to avoid double
+     * @param listOfAlreadyUsedCommit list of vulnerability commits to avoid double
+     * @param bugTracker should we use reference to bug tracker (true) (better reliability) or default keywords
      *
-     * @return list of pair containing the hash and the bugzilla link
+     * @return list of commit
      */
-    fun populatewithBugReport(listOfAlreadyUsedCommit: List<String>? = null): List<Pair<String, String>?>? {
+    fun populatewithBug(listOfAlreadyUsedCommit: List<String>? = null,bugTracker : Boolean): List<String?>? {
 
         try {
             val git = Git.open(File(pathToRepo))
             val commits = git.log().all().call().toList()
-            return MultiThreading.onFunctionWithSingleOutput(commits, { commit -> processingCommitBugzilla(commit, listOfAlreadyUsedCommit) }, Constants.NB_THREAD)
+            val listOfKeywords : List<String>
+            if (bugTracker){
+                listOfKeywords = listOf(Constants.BUG_TRACKER)
+            }else{
+                listOfKeywords = Constants.DEFAULT_BUG_INDICATORS
+            }
+            return MultiThreading.onFunctionWithSingleOutput(commits, { commit -> processingCommitBug(commit, listOfAlreadyUsedCommit, listOfKeywords) }, Constants.NB_THREAD)
         } catch (e: IOException) {
             e.printStackTrace()
         } catch (e: GitAPIException) {
@@ -90,6 +93,32 @@ class BugReportSet(path: String) {
     }
 
     /**
+     * Method to retrieve all files that were concern by a commit mentionning a bug
+     *
+     * @param listOfBug list of commit mentionning bug
+     *
+     * @return set of files
+     */
+    fun setOfBugFiles(listOfBug: List<String?>?, listOfVulnerableFiles: Set<String>): Set<String> {
+        val setOfBuggyFiles = HashSet<String>()
+        val gitUtilitary = GitUtilitary(pathToRepo)
+        setOfBuggyFiles.addAll(MultiThreading.onFunctionWithListOutput(listOfBug!!, { entry -> generatingListOfFile(entry, listOfVulnerableFiles, gitUtilitary) }, Constants.NB_THREAD))
+        gitUtilitary.close()
+        return setOfBuggyFiles
+    }
+
+    /**
+     * Method to generate the buggy set
+     * Take [Constants].BUG_SHARE buggy file at the time of the vulnerability
+     *
+     * @param listOfBugFilesInHistory
+     * @param listOfCommitVulnerable list of vulnerability
+     */
+    fun createFilesHistoricallyBuggyDataset(listOfCommitVulnerable: List<String>, listOfBugFilesInHistory: Set<String>): List<Document>{
+        return Utils.createDocumentFromTimeOfVuln(listOfCommitVulnerable,Constants.BUG_SHARE,listOfBugFilesInHistory.toList(),pathToRepo)
+    }
+
+    /**
      * Method to generate a list of buggy file from a buggy commit
      *
      * @param entryhash of the commit and link to bugzilla
@@ -114,31 +143,49 @@ class BugReportSet(path: String) {
             val newContent = gitUtilitary.retrievingFileFromSpecificCommit(commit, newName)
 
             val buggyDoc = Document(oldname, oldTime, oldHash, oldContent)
-            val patchedDoc = Document(newName,time,commit,newContent)
-            listOfBuggy.add(BuggyFile(buggyDoc,patchedDoc,bugTracker,fullMessage))
+            val patchedDoc = Document(newName, time, commit, newContent)
+            listOfBuggy.add(BuggyFile(buggyDoc, patchedDoc, bugTracker, fullMessage))
         }
         return listOfBuggy
     }
 
     companion object BuggySideFunction {
         /**
-         * Method to confirm if a commit mention the bug tracker of the project
+         * Method to confirm if a commit mention bug
          *
          * @param commitUnderStudy: commit under Study
          * *
-         * @return array of hash and url to the bug report
+         * @return hash of the commit
          */
-        fun processingCommitBugzilla(commitUnderStudy: RevCommit, listOfAlreadyUsedCommit: List<String>?): Pair<String, String>? {
+        fun processingCommitBug(commitUnderStudy: RevCommit, listOfAlreadyUsedCommit: List<String>?, listOfKeywords: List<String>): String? {
             if (listOfAlreadyUsedCommit != null) {
                 if (listOfAlreadyUsedCommit.contains(commitUnderStudy.name)) return null
             }
-            val message = commitUnderStudy.fullMessage.toLowerCase()
-            val listofUrl = RegexpAndWalk.extractUrls(message)
-            for (url in listofUrl) {
-                if (url.contains(Constants.BUG_TRACKER) && !commitUnderStudy.fullMessage.contains("Merge"))
-                    return Pair(commitUnderStudy.name, url.replace(")", ""))
-            }
+            val message = commitUnderStudy.fullMessage
+            if (RegexpAndWalk.containsAKeyword(message,listOfKeywords) && !commitUnderStudy.fullMessage.contains("Merge"))
+                return commitUnderStudy.name
             return null
         }
+
+        /**
+         * Method to retrieve the list of file
+         */
+        fun generatingListOfFile(entry: String?, listOfVulnerableFiles: Set<String>, gitUtilitary: GitUtilitary): List<String> {
+            val listOfbuggyFile = ArrayList<String>()
+            val listOfModifiedFile = gitUtilitary.getListOfModifiedFile(entry!!, Constants.FILE_EXTENSION)
+            for (file in listOfModifiedFile) {
+                val newName = file
+                val previousCommit = gitUtilitary.previousCommitImpactingAFile(file, entry)
+                if (previousCommit != null) {
+                    val oldname = previousCommit.filePath
+                    if (!listOfVulnerableFiles.contains(newName) && !listOfVulnerableFiles.contains(oldname)) {
+                        listOfbuggyFile.add(oldname)
+                        listOfbuggyFile.add(newName)
+                    }
+                }
+            }
+            return listOfbuggyFile
+        }
     }
+
 }
