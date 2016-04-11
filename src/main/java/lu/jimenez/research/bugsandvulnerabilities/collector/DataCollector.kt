@@ -69,6 +69,7 @@ class DataCollector(repositoryPath: String, savingFolder: String) {
             Constants.SOFTWARE_GIT=properties.getProperty("softwareGit")
             Constants.JYTHON = properties.getProperty("jython")
             Constants.FILE_EXTENSION = properties.getProperty("extension")
+            Constants.BUG_TRACKER = properties.getProperty("bugTracker")
 
         }
     }
