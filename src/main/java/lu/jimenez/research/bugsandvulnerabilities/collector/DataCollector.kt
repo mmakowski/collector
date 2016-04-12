@@ -37,7 +37,9 @@ import lu.jimenez.research.bugsandvulnerabilities.model.internal.DocumentType
 import lu.jimenez.research.bugsandvulnerabilities.utils.Serialization
 import java.util.*
 
-
+/**
+ * Data Collector class gather everything needed to build the dataset
+ */
 class DataCollector(val repositoryPath: String, val savingFolder: String) {
 
     /**
@@ -61,6 +63,14 @@ class DataCollector(val repositoryPath: String, val savingFolder: String) {
         return listOfVulnerability
     }
 
+    /**
+     * Generating the Bug set comming from either bugtracker or keyword
+     *
+     * @param listOfVulnerableCommit list of commit already refer as vulnerable patch
+     * @param bugTracker should use bug tracker as a way or keyword
+     *
+     * @return list of [BuggyFile]
+     */
     fun generateBuggySet(listOfVulnerableCommit: Map<String, Int>? = null, bugTracker: Boolean): List<BuggyFile> {
         val brs = BugSet(repositoryPath)
         val listOfCommit = brs.populatewithBug(listOfVulnerableCommit?.keys?.toList(),bugTracker)?: return listOf()
@@ -72,6 +82,14 @@ class DataCollector(val repositoryPath: String, val savingFolder: String) {
         return listOfBugs
     }
 
+    /**
+     * Generating a set of files that have an history of being buggy at the time where the vulnerability was patched
+     *
+     * @param listOfVulnerableCommit
+     * @param listOfVulnerableFiles
+     *
+     * @return list of [Document]
+     */
     fun generateBuggyFromVulnerabilityTime(listOfVulnerableFiles: Set<String>, listOfVulnerableCommit: Map<String,Int>): Pair<Set<String>, List<Document>> {
         val bhs = BugSet(repositoryPath)
         val listOfCommit = bhs.populatewithBug(listOfVulnerableCommit.keys.toList(),false)
@@ -81,6 +99,9 @@ class DataCollector(val repositoryPath: String, val savingFolder: String) {
         return Pair(setOfBugFiles,listOfBugs)
     }
 
+    /**
+     * Method to generate a clear set given a list of files to exclude and a list of commits to work
+     */
     fun generateClearSet(ListOfAlreadyUsedFiles: Set<String>, listOfCommitToWorkOn: Map<String,Int>, numberOfIteration: Int): List<Document> {
         val cs = ClearSet(repositoryPath)
         val listOfClearFiles = cs.setOfClearFile(ListOfAlreadyUsedFiles)
@@ -89,6 +110,9 @@ class DataCollector(val repositoryPath: String, val savingFolder: String) {
         return listOfClear
     }
 
+    /**
+     * Method generating the Exeprimental setting dataset
+     */
     fun generateExperimentalVulnerableSet(listOfVulnerableFiles: List<VulnerableFile>, addingClearFile: Boolean, extraPath: String){
         //Retrieving Vulnerability List
         val listOfCommit = UtilitaryMethods.setOfCommitPatchVulnerability(listOfVulnerableFiles)
@@ -136,6 +160,11 @@ class DataCollector(val repositoryPath: String, val savingFolder: String) {
         Serialization.saveMapHashData(mapOfIDDoc,savingFolder+"${extraPath}experimental_MapOfIdDoc.obj")
     }
 
+    /**
+     * Method to generate a set corresponding to the realistic setting experiment
+     *
+     * @param listOfVulnerableFiles
+     */
     fun generateRealisticVulnerableSet(listOfVulnerableFiles: List<VulnerableFile>, extraPath: String){
 
         //Processing Vulnerable
@@ -182,7 +211,9 @@ class DataCollector(val repositoryPath: String, val savingFolder: String) {
 
 
     companion object run {
-
+        /**
+         * Main method launching the gathering process
+         */
         @JvmStatic
         fun main(args: Array<String>) {
             if (args.size > 0 && args.size < 3) {
@@ -211,6 +242,9 @@ class DataCollector(val repositoryPath: String, val savingFolder: String) {
 
         }
 
+        /**
+         * Method for loading properties located in the collector.properties file
+         */
         fun loadingProperties() {
             val inputStream = this.javaClass.classLoader.getResourceAsStream("collector.properties")
 
