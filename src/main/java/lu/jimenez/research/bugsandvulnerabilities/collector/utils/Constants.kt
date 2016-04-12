@@ -57,5 +57,7 @@ object Constants {
     )
     var BUG_SHARE = 1
     var CLEAR_SHARE: Int = 1
-
+    var CVE_ONLY: Boolean = true
+    var REALISTIC_GEN: Boolean = false
+    var EXPERIMENTAL_GEN: Boolean = false
 }

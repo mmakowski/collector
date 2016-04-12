@@ -36,12 +36,11 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.revwalk.RevCommit
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.*
 
 
-class BugSet(path:String){
+class BugSet(path: String) {
     val pathToRepo = "$path.git"
 
     /**
@@ -52,18 +51,17 @@ class BugSet(path:String){
      *
      * @return list of commit
      */
-    fun populatewithBug(listOfAlreadyUsedCommit: List<String>? = null,bugTracker : Boolean): List<String?>? {
-
+    fun populatewithBug(listOfAlreadyUsedCommit: List<String>? = null, bugTracker: Boolean): List<Pair<String,String>?>? {
         try {
             val git = Git.open(File(pathToRepo))
             val commits = git.log().all().call().toList()
-            val listOfKeywords : List<String>
-            if (bugTracker){
+            val listOfKeywords: List<String>
+            if (bugTracker) {
                 listOfKeywords = listOf(Constants.BUG_TRACKER)
-            }else{
+            } else {
                 listOfKeywords = Constants.DEFAULT_BUG_INDICATORS
             }
-            return MultiThreading.onFunctionWithSingleOutput(commits, { commit -> processingCommitBug(commit, listOfAlreadyUsedCommit, listOfKeywords) }, Constants.NB_THREAD)
+            return MultiThreading.onFunctionWithSingleOutput(commits, { commit -> processingCommitBug(commit, listOfAlreadyUsedCommit, listOfKeywords, bugTracker) }, Constants.NB_THREAD)
         } catch (e: IOException) {
             e.printStackTrace()
         } catch (e: GitAPIException) {
@@ -79,14 +77,13 @@ class BugSet(path:String){
      *
      * @return list of [BuggyFile]
      */
-    fun createBuggyDataset(listOfBug : List<Pair<String, String>?>): List<BuggyFile>{
-        try{
+    fun createBuggyDataset(listOfBug: List<Pair<String, String>?>): List<BuggyFile> {
+        try {
             val gitUtilitary = GitUtilitary(pathToRepo)
-            val buggySet = MultiThreading.onFunctionWithListOutput(listOfBug,{entry -> generatingBuggyFiles(entry,gitUtilitary)},Constants.NB_THREAD)
+            val buggySet = MultiThreading.onFunctionWithListOutput(listOfBug, { entry -> generatingBuggyFiles(entry, gitUtilitary) }, Constants.NB_THREAD)
             gitUtilitary.close()
             return buggySet
-        }
-        catch(e: IOException){
+        } catch(e: IOException) {
             e.printStackTrace()
         }
         return listOf()
@@ -99,10 +96,10 @@ class BugSet(path:String){
      *
      * @return set of files
      */
-    fun setOfBugFiles(listOfBug: List<String?>?, listOfVulnerableFiles: Set<String>): Set<String> {
+    fun setOfBugFiles(listOfBug: List<Pair<String,String>?>?, listOfVulnerableFiles: Set<String>): Set<String> {
         val setOfBuggyFiles = HashSet<String>()
         val gitUtilitary = GitUtilitary(pathToRepo)
-        setOfBuggyFiles.addAll(MultiThreading.onFunctionWithListOutput(listOfBug!!, { entry -> generatingListOfFile(entry, listOfVulnerableFiles, gitUtilitary) }, Constants.NB_THREAD))
+        setOfBuggyFiles.addAll(MultiThreading.onFunctionWithListOutput(listOfBug!!, { entry -> generatingListOfFile(entry?.first, listOfVulnerableFiles, gitUtilitary) }, Constants.NB_THREAD))
         gitUtilitary.close()
         return setOfBuggyFiles
     }
@@ -114,8 +111,8 @@ class BugSet(path:String){
      * @param listOfBugFilesInHistory
      * @param listOfCommitVulnerable list of vulnerability
      */
-    fun createFilesHistoricallyBuggyDataset(listOfCommitVulnerable: List<String>, listOfBugFilesInHistory: Set<String>): List<Document>{
-        return Utils.createDocumentFromTimeOfVuln(listOfCommitVulnerable,Constants.BUG_SHARE,listOfBugFilesInHistory.toList(),pathToRepo)
+    fun createFilesHistoricallyBuggyDataset(listOfCommitVulnerable: Map<String, Int>, listOfBugFilesInHistory: Set<String>): List<Document> {
+        return Utils.createDocumentFromTimeOfVuln(listOfCommitVulnerable, Constants.BUG_SHARE, listOfBugFilesInHistory.toList(), pathToRepo)
     }
 
     /**
@@ -133,7 +130,7 @@ class BugSet(path:String){
         val fullMessage = gitUtilitary.getCommitMessage(commit)
         val time = gitUtilitary.getTimeCommit(commit)
         val listOfModifiedFile = gitUtilitary.getListOfModifiedFile(commit, Constants.FILE_EXTENSION)
-        for (file in listOfModifiedFile){
+        for (file in listOfModifiedFile) {
             val newName = file
             val previousCommit = gitUtilitary.previousCommitImpactingAFile(file, commit)
             val oldname = previousCommit!!.filePath
@@ -144,7 +141,7 @@ class BugSet(path:String){
 
             val buggyDoc = Document(oldname, oldTime, oldHash, oldContent)
             val patchedDoc = Document(newName, time, commit, newContent)
-            listOfBuggy.add(BuggyFile(buggyDoc, patchedDoc, bugTracker, fullMessage))
+            listOfBuggy.add(BuggyFile(buggyDoc, patchedDoc, fullMessage, bugTracker))
         }
         return listOfBuggy
     }
@@ -157,13 +154,21 @@ class BugSet(path:String){
          * *
          * @return hash of the commit
          */
-        fun processingCommitBug(commitUnderStudy: RevCommit, listOfAlreadyUsedCommit: List<String>?, listOfKeywords: List<String>): String? {
+        fun processingCommitBug(commitUnderStudy: RevCommit, listOfAlreadyUsedCommit: List<String>?, listOfKeywords: List<String>, bugTracker: Boolean): Pair<String,String>? {
             if (listOfAlreadyUsedCommit != null) {
                 if (listOfAlreadyUsedCommit.contains(commitUnderStudy.name)) return null
             }
             val message = commitUnderStudy.fullMessage
-            if (RegexpAndWalk.containsAKeyword(message,listOfKeywords) && !commitUnderStudy.fullMessage.contains("Merge"))
-                return commitUnderStudy.name
+            if (bugTracker) {
+                val listofUrl = RegexpAndWalk.extractUrls(message)
+                for (url in listofUrl) {
+                    if (RegexpAndWalk.containsAKeyword(url, listOfKeywords) && !message.contains("Merge"))
+                        return Pair(commitUnderStudy.name,url.replace(")", ""))
+                }
+            } else {
+                if (RegexpAndWalk.containsAKeyword(message, listOfKeywords) && !message.contains("Merge"))
+                    return Pair(commitUnderStudy.name,"")
+            }
             return null
         }
 

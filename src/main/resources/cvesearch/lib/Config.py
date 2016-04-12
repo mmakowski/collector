@@ -12,8 +12,8 @@
 import sys
 import os
 
-runPath = os.path.dirname(os.path.realpath(__file__))
-#runPath = "/Users/youradmin/Documents/Perso/Prog/github/VPM/collection/target/classes/cvesearch/lib"
+#runPath = os.path.dirname(os.path.realpath(__file__))
+runPath = "/Users/youradmin/Documents/Perso/Prog/github/vulnerabilitiesandbugs/collector/target/classes/cvesearch/lib/"
 
 import pymongo
 import redis

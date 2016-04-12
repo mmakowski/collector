@@ -31,35 +31,36 @@ import java.io.FileNotFoundException
 import java.util.*
 
 
-
 object Utils {
     /**
      * Method creating a dataset of files from a given list and from the time of given commit
      *
-     * @param listOfCommittoWorkOn typically list of vulnerable commits
+     * @param mapOfCommittoWorkOn typically list of vulnerable commits
      * @param listOfFilesToConsider can be clear or buggy
      * @param numberOfRequiredIteration number of files per commit
      *
      * linked list is used to select the first element and to add it at the end when the iteration is over
      * @return list of clear file ([Document])
      */
-    fun createDocumentFromTimeOfVuln(listOfCommittoWorkOn: List<String>, numberOfRequiredIteration: Int, listOfFilesToConsider: List<String>, pathToRepo: String): List<Document> {
+    fun createDocumentFromTimeOfVuln(mapOfCommittoWorkOn: Map<String, Int>, numberOfRequiredIteration: Int, listOfFilesToConsider: List<String>, pathToRepo: String): List<Document> {
         val listOfClear = ArrayList<Document>()
         val gitUtilitary = GitUtilitary(pathToRepo)
         val linkedListOfClearFile = LinkedList<String>(listOfFilesToConsider)
-        for (commit in listOfCommittoWorkOn) {
-            val time = gitUtilitary.getTimeCommit(commit)
-            var i = 0
-            while (i < numberOfRequiredIteration) {
-                val name = linkedListOfClearFile.poll()
-                try {
-                    val content = gitUtilitary.retrievingFileFromSpecificCommit(commit, name)
-                    listOfClear.add(Document(name, time, commit, content))
-                    i++
-                } catch(e: FileNotFoundException) {
-                    println("$name is not working with $commit ")
-                } finally {
-                    linkedListOfClearFile.add(name)
+        for (commit in mapOfCommittoWorkOn) {
+            val time = gitUtilitary.getTimeCommit(commit.key)
+            for (fil in 1..commit.value) {
+                var i = 0
+                while (i < numberOfRequiredIteration) {
+                    val name = linkedListOfClearFile.poll()
+                    try {
+                        val content = gitUtilitary.retrievingFileFromSpecificCommit(commit.key, name)
+                        listOfClear.add(Document(name, time, commit.key, content))
+                        i++
+                    } catch(e: FileNotFoundException) {
+                        println("$name is not working with $commit ")
+                    } finally {
+                        linkedListOfClearFile.add(name)
+                    }
                 }
             }
         }

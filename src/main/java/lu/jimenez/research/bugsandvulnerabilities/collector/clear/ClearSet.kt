@@ -29,7 +29,6 @@ import lu.jimenez.research.bugsandvulnerabilities.collector.utils.Constants
 import lu.jimenez.research.bugsandvulnerabilities.collector.utils.Utils
 import lu.jimenez.research.bugsandvulnerabilities.model.internal.Document
 import lu.jimenez.research.bugsandvulnerabilities.utils.RegexpAndWalk
-import java.io.FileNotFoundException
 import java.util.*
 
 
@@ -40,7 +39,7 @@ import java.util.*
  * @param path path to the git repository
  *
  */
-class ClearSet (val path: String) {
+class ClearSet(val path: String) {
     val pathToRepo = path + ".git"
 
     /**
@@ -63,12 +62,12 @@ class ClearSet (val path: String) {
      *
      * @param listOfCommittoWorkOn list of vulnerable commits
      * @param listOfClearFile list of file obtain from the setOfClearFiles methods
-     * @param numberOfRequiredIteration number of clear file per vulnerability typically one for accurate and 16 for real
+     * @param numberOfIteration number of clear file per vulnerability typically one for accurate and 16 for real
      *
      * linked list is used to select the first element and to add it at the end when the iteration is over
      * @return list of clear file ([Document])
      */
-    fun createClearSet(listOfCommittoWorkOn: List<String>, listOfClearFile: List<String>): List<Document> {
-        return Utils.createDocumentFromTimeOfVuln(listOfCommittoWorkOn, Constants.CLEAR_SHARE,listOfClearFile,pathToRepo )
+    fun createClearSet(listOfCommittoWorkOn: Map<String,Int>, listOfClearFile: List<String>, numberOfIteration : Int): List<Document> {
+        return Utils.createDocumentFromTimeOfVuln(listOfCommittoWorkOn, numberOfIteration, listOfClearFile, pathToRepo)
     }
 }
