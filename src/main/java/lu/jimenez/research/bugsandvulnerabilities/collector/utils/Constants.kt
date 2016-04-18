@@ -45,15 +45,15 @@ object Constants {
     var FILE_EXTENSION = "*"
 
     val DEFAULT_BUG_INDICATORS = listOf(
-            "error",
-            "bug",
-            "fix",
-            "issue",
-            "mistake",
-            "incorrect",
-            "fault",
-            "defect",
-            "flaw"
+            //"error",
+            "bug"
+            //"fix",
+           // "issue",
+            //"mistake",
+            //"incorrect",
+           // "fault",
+           // "defect",
+           // "flaw"
     )
     var BUG_SHARE = 1
     var CLEAR_SHARE: Int = 1

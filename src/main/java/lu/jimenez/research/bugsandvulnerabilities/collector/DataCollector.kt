@@ -92,8 +92,11 @@ class DataCollector(val repositoryPath: String, val savingFolder: String) {
      */
     fun generateBuggyFromVulnerabilityTime(listOfVulnerableFiles: Set<String>, listOfVulnerableCommit: Map<String,Int>): Pair<Set<String>, List<Document>> {
         val bhs = BugSet(repositoryPath)
+        println("plouf1")
         val listOfCommit = bhs.populatewithBug(listOfVulnerableCommit.keys.toList(),false)
+        println("plouf2")
         val setOfBugFiles = bhs.setOfBugFiles(listOfCommit,listOfVulnerableFiles)
+        println("plouf3")
         val listOfBugs = bhs.createFilesHistoricallyBuggyDataset(listOfVulnerableCommit,setOfBugFiles)
         //Serialization.saveListData(listOfBugs, savingFolder + "${extraPath}bug.obj")
         return Pair(setOfBugFiles,listOfBugs)
@@ -171,15 +174,18 @@ class DataCollector(val repositoryPath: String, val savingFolder: String) {
         val listOfCommit = UtilitaryMethods.setOfCommitPatchVulnerability(listOfVulnerableFiles)
         val setOfVulnerable = UtilitaryMethods.setOfAlreadyPresentFiles(listOfVulnerableFiles)
 
+        println("vuln ok")
+
         //Generating Buggy set
         val buggyset = generateBuggyFromVulnerabilityTime(setOfVulnerable,listOfCommit)
         val listOfBuggy: List<Document> = buggyset.second
         val setOfAlreadyUsedFiles = (buggyset.first as MutableSet)
         setOfAlreadyUsedFiles.addAll(setOfVulnerable)
 
+        println("bug ok")
         //Generating clear set
         val listOfClear: List<Document> = generateClearSet(setOfAlreadyUsedFiles,listOfCommit,Constants.CLEAR_SHARE)
-
+        println("clear ok")
         //Transforming it into Hashmap
         val mapOfIDDoc: MutableMap<Int, Document> = mutableMapOf()
         val mapOfIDCat: MutableMap<Int, DocumentType> = mutableMapOf()

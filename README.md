@@ -22,19 +22,19 @@ The model and utils modules of the project are also required
  + DataCollector Main class containing everything require to build a set
  + buggy clear vulnerable are package containing the function required to build the dataset
  + collector.properties contains all properties that can be modified before each run
-    * nbThreads (number of thread that multithreading function should use)
-    * software (software under study)
-    * yearBeginning first year to study (min 2002)
-    * yearEnd last year under consideration
-    * softwareGit regexp of the git repo of the software
-    * jython path to the jython install
-    * extension regexp to filter file according the language
-    * bugTracker name of the bugtracker
-    * bugShare how many bugs for the realistic settings
-    * clearShare how many clear per vulnerable files for the realistic setting
-    * cveOnly should we only work on cve or count commit mentionnning vulnerability
-    * experimentalgen generate the experimental dataset
-    * realisticgen generate the realistic dataset
+    * nbThreads: (number of thread that multithreading function should use)
+    * software: (software under study)
+    * yearBeginning: first year to study (min 2002)
+    * yearEnd: last year under consideration
+    * softwareGit: regexp of the git repo of the software
+    * jython: path to the jython install
+    * extension: regexp to filter file according the language
+    * bugTracker: name of the bugtracker
+    * bugShare: how many bugs for the realistic settings
+    * clearShare: how many clear per vulnerable files for the realistic setting
+    * cveOnly: should we only work on cve or count commit mentionnning vulnerability
+    * experimentalgen: generate the experimental dataset
+    * realisticgen: generate the realistic dataset
     
     
    
