@@ -270,7 +270,7 @@ class DataCollector(val repositoryPath: String, val savingFolder: String) {
             Constants.CVE_ONLY = properties.getProperty("cveOnly").toBoolean()
             Constants.REALISTIC_GEN = properties.getProperty("realisticgen").toBoolean()
             Constants.EXPERIMENTAL_GEN = properties.getProperty("experimentalgen").toBoolean()
-
+            Constants.FIND_CWE = properties.getProperty("findcwe").toBoolean()
         }
     }
 }

@@ -60,4 +60,5 @@ object Constants {
     var CVE_ONLY: Boolean = true
     var REALISTIC_GEN: Boolean = false
     var EXPERIMENTAL_GEN: Boolean = false
+    var FIND_CWE :Boolean =false
 }
