@@ -61,3 +61,5 @@ fabric.properties
 # Created by .ignore support plugin (hsz.mobi)
 src/main/resources/cve_XML/*.xml
 src/test/resources
+*.iml
+target
