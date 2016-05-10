@@ -82,8 +82,9 @@
                     <includePluginDependencies>true</includePluginDependencies>
                     <mainClass>lu.jimenez.research.bugsandvulnerabilities.collector.DataCollector</mainClass>
                     <arguments>
-                        <argument>/Users/youradmin/Documents/Recherche/Vulnerability_Prediction_Model/Dataset/linux/
+                        <argument>/yourpath/to/software/repository
                         </argument>
+                        <argument>/yourpath/to/save/object/into</argument>
                     </arguments>
                 </configuration>
             </plugin>
