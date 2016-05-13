@@ -236,7 +236,7 @@ class DataCollector(val repositoryPath: String, val savingFolder: String) {
                 val listOfVulnerable = dataCollector.generatingVulnerableSet()
 
                 if(Constants.EXPERIMENTAL_GEN){
-                    dataCollector.generateExperimentalVulnerableSet(listOfVulnerable,true,"")
+                    dataCollector.generateExperimentalVulnerableSet(listOfVulnerable,false,"")
                 }
                 if(Constants.REALISTIC_GEN)
                     dataCollector.generateRealisticVulnerableSet(listOfVulnerable,"")

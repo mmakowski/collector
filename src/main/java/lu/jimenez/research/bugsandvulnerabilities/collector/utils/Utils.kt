@@ -54,7 +54,7 @@ object Utils {
                     val name = linkedListOfClearFile.poll()
                     try {
                         val content = gitUtilitary.retrievingFileFromSpecificCommit(commit.key, name)
-                        listOfClear.add(Document(name, time, commit.key, content))
+                        listOfClear.add(Document(name, time, commit.key, content!!))
                         i++
                     } catch(e: FileNotFoundException) {
                         println("$name is not working with $commit ")

@@ -51,7 +51,7 @@ class BugSet(path: String) {
      *
      * @return list of commit
      */
-    fun populatewithBug(listOfAlreadyUsedCommit: List<String>? = null, bugTracker: Boolean): List<Pair<String,String>?>? {
+    fun populatewithBug(listOfAlreadyUsedCommit: List<String>? = null, bugTracker: Boolean): List<Pair<String, String>?>? {
         try {
             val git = Git.open(File(pathToRepo))
             val commits = git.log().all().call().toList()
@@ -96,7 +96,7 @@ class BugSet(path: String) {
      *
      * @return set of files
      */
-    fun setOfBugFiles(listOfBug: List<Pair<String,String>?>?, listOfVulnerableFiles: Set<String>): Set<String> {
+    fun setOfBugFiles(listOfBug: List<Pair<String, String>?>?, listOfVulnerableFiles: Set<String>): Set<String> {
         val setOfBuggyFiles = HashSet<String>()
         val gitUtilitary = GitUtilitary(pathToRepo)
         setOfBuggyFiles.addAll(MultiThreading.onFunctionWithListOutput(listOfBug!!, { entry -> generatingListOfFile(entry?.first, listOfVulnerableFiles, gitUtilitary) }, Constants.NB_THREAD))
@@ -138,10 +138,11 @@ class BugSet(path: String) {
             val oldTime = gitUtilitary.getTimeCommit(oldHash)
             val oldContent = gitUtilitary.retrievingFileFromSpecificCommit(oldHash, oldname)
             val newContent = gitUtilitary.retrievingFileFromSpecificCommit(commit, newName)
-
-            val buggyDoc = Document(oldname, oldTime, oldHash, oldContent)
-            val patchedDoc = Document(newName, time, commit, newContent)
-            listOfBuggy.add(BuggyFile(buggyDoc, patchedDoc, fullMessage, bugTracker))
+            if (oldContent != null && newContent != null) {
+                val buggyDoc = Document(oldname, oldTime, oldHash, oldContent)
+                val patchedDoc = Document(newName, time, commit, newContent)
+                listOfBuggy.add(BuggyFile(buggyDoc, patchedDoc, fullMessage, bugTracker))
+            }
         }
         return listOfBuggy
     }
@@ -154,7 +155,7 @@ class BugSet(path: String) {
          * *
          * @return hash of the commit
          */
-        fun processingCommitBug(commitUnderStudy: RevCommit, listOfAlreadyUsedCommit: List<String>?, listOfKeywords: List<String>, bugTracker: Boolean): Pair<String,String>? {
+        fun processingCommitBug(commitUnderStudy: RevCommit, listOfAlreadyUsedCommit: List<String>?, listOfKeywords: List<String>, bugTracker: Boolean): Pair<String, String>? {
             if (listOfAlreadyUsedCommit != null) {
                 if (listOfAlreadyUsedCommit.contains(commitUnderStudy.name)) return null
             }
@@ -163,11 +164,11 @@ class BugSet(path: String) {
                 val listofUrl = RegexpAndWalk.extractUrls(message)
                 for (url in listofUrl) {
                     if (RegexpAndWalk.containsAKeyword(url, listOfKeywords) && !message.contains("Merge"))
-                        return Pair(commitUnderStudy.name,url.replace(")", ""))
+                        return Pair(commitUnderStudy.name, url.replace(")", ""))
                 }
             } else {
                 if (RegexpAndWalk.containsAKeyword(message, listOfKeywords) && !message.contains("Merge"))
-                    return Pair(commitUnderStudy.name,"")
+                    return Pair(commitUnderStudy.name, "")
             }
             return null
         }
