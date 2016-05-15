@@ -51,11 +51,12 @@ object Utils {
             for (fil in 1..commit.value) {
                 var i = 0
                 while (i < numberOfRequiredIteration) {
-                    val name = linkedListOfClearFile.poll()
+                    var name=linkedListOfClearFile.poll()
                     try {
                         val content = gitUtilitary.retrievingFileFromSpecificCommit(commit.key, name)
-                        listOfClear.add(Document(name, time, commit.key, content!!))
-                        i++
+                        if (content != null){
+                        listOfClear.add(Document(name, time, commit.key, content))
+                        i++}
                     } catch(e: FileNotFoundException) {
                         println("$name is not working with $commit ")
                     } finally {
