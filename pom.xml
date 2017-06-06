@@ -6,7 +6,7 @@
 
     <groupId>lu.jimenez.research</groupId>
     <artifactId>bugsandvulnerabilities-collector</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
 
@@ -24,18 +24,13 @@
         <dependency>
             <groupId>lu.jimenez.research</groupId>
             <artifactId>bugsandvulnerabilities-model</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.python</groupId>
-            <artifactId>jython</artifactId>
-            <version>2.7.1b2</version>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 
     <properties>
-        <kotlin.version>1.0.0</kotlin.version>
-        <dokka.version>0.9.4</dokka.version>
+        <kotlin.version>1.0.4</kotlin.version>
+        <dokka.version>0.9.8</dokka.version>
         <spek.version>0.1.195</spek.version>
     </properties>
 
@@ -82,9 +77,8 @@
                     <includePluginDependencies>true</includePluginDependencies>
                     <mainClass>lu.jimenez.research.bugsandvulnerabilities.collector.DataCollector</mainClass>
                     <arguments>
-                        <argument>/yourpath/to/software/repository
-                        </argument>
-                        <argument>/yourpath/to/save/object/into</argument>
+                        <argument>linux path</argument>
+                        <argument>result folder</argument>
                     </arguments>
                 </configuration>
             </plugin>

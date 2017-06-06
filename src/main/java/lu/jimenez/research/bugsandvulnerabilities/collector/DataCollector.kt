@@ -262,7 +262,6 @@ class DataCollector(val repositoryPath: String, val savingFolder: String) {
             Constants.YEAR_BEGINNING = properties.getProperty("yearBeginning").toInt()
             Constants.YEAR_END = properties.getProperty("yearEnd").toInt()
             Constants.SOFTWARE_GIT = properties.getProperty("softwareGit")
-            Constants.JYTHON = properties.getProperty("jython")
             Constants.FILE_EXTENSION = properties.getProperty("extension")
             Constants.BUG_TRACKER = properties.getProperty("bugTracker")
             Constants.BUG_SHARE = properties.getProperty("bugShare").toInt()
