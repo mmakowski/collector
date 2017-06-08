@@ -41,7 +41,6 @@ object Constants {
     var SOFTWARE_GIT = "*"
     var BUG_TRACKER = "*"
 
-    var JYTHON= "*"
     var FILE_EXTENSION = "*"
 
     val DEFAULT_BUG_INDICATORS = listOf(
