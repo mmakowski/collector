@@ -77,8 +77,8 @@
                     <includePluginDependencies>true</includePluginDependencies>
                     <mainClass>lu.jimenez.research.bugsandvulnerabilities.collector.DataCollector</mainClass>
                     <arguments>
-                        <argument>linux path</argument>
-                        <argument>result folder</argument>
+                        <argument>${linux.repo}</argument>
+                        <argument>${output.dir}</argument>
                     </arguments>
                 </configuration>
             </plugin>
